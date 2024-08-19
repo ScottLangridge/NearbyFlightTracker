@@ -1,9 +1,12 @@
 from OpenSky import OpenSky
+from secrets import SECRETS
 
+
+CONST_RANGE = 10
 
 def debug():
-    api = OpenSky()
-    print(api.get_flights_in_box(45.8389, 5.9962, 47.8229, 10.5226))
+    api = OpenSky(SECRETS['username'], SECRETS['password'])
+    print(api.get_flights_in_range(SECRETS['my_lat'], SECRETS['my_lon'], CONST_RANGE))
 
 
 if __name__ == '__main__':

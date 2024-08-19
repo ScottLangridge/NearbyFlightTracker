@@ -6,7 +6,7 @@ import utils
 from utils import nullable_datetime
 
 
-class OpenSkyResponse:
+class OpenSkyStatesAllResponse:
     def __init__(self, response_json):
         # See https://openskynetwork.github.io/opensky-api/rest.html#response
         self.time = nullable_datetime(response_json['time'])
@@ -89,9 +89,9 @@ class OpenSky:
         assert response.status_code != 401, f'OpenSky assert_connection received 401 - Unauthorized. Likely incorrect login details.'
         assert response.status_code == 200, f'OpenSky assert_connection received unexpected status: {response.status_code}'
 
-    # Note, actually returns flights in a box of dimensions range_km.
-    # Flights in the corners of the box will be further away than range_km.
-    def get_flights_in_range(self, lat, lon, range_km):
+    # Note, actually returns states of aircraft in a box of dimensions range_km.
+    # Aircraft in the corners of the box will be further away than range_km.
+    def get_states_in_range(self, lat, lon, range_km):
         origin = Point(lat, lon)
 
         north_point = geodesic(kilometers=range_km).destination(origin, 0)  # North (max latitude)
@@ -104,11 +104,11 @@ class OpenSky:
         min_lon = west_point.longitude
         max_lon = east_point.longitude
 
-        return self.get_flights_in_box(min_lat, min_lon, max_lat, max_lon)
+        return self.get_states(min_lat, min_lon, max_lat, max_lon)
 
-    def get_flights_in_box(self, lamin, lomin, lamax, lomax):
+    def get_states(self, lamin, lomin, lamax, lomax):
         if self.debug_mode:
-            return OpenSkyResponse(utils.debug_opensky_response(5))
+            return OpenSkyStatesAllResponse(utils.debug_states_all_response(5))
 
         params = {
             'lamin': lamin,
@@ -118,4 +118,4 @@ class OpenSky:
         }
 
         response = requests.get(self.root_url + '/states/all', auth=self.auth, params=params)
-        return OpenSkyResponse(response.json())
+        return OpenSkyStatesAllResponse(response.json())

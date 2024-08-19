@@ -21,7 +21,7 @@ class OpenSkyResponse:
         print(f'====================')
         print(f'OpenSkyResponse from {self.time}')
 
-        print(f'Aircraft:')
+        print(f'Aircraft ({len(self.states)}):')
         for state in self.states:
             print(
                 f'  - {state.callsign} | '

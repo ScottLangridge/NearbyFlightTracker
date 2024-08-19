@@ -6,7 +6,7 @@ import utils
 from utils import nullable_datetime
 
 
-class OpenSkyStatesAllResponse:
+class OpenSkyStatesResponse:
     def __init__(self, response_json):
         # See https://openskynetwork.github.io/opensky-api/rest.html#response
         self.time = nullable_datetime(response_json['time'])
@@ -24,7 +24,7 @@ class OpenSkyStatesAllResponse:
         print(f'Aircraft ({len(self.states)}):')
         for state in self.states:
             print(
-                f'  - {state.callsign} | '
+                f'  - {state.callsign}/{state.icao24} | '
                 f'lat: {state.latitude} '
                 f'lon: {state.longitude} '
                 f'alt: {state.baro_altitude} '
@@ -108,7 +108,7 @@ class OpenSky:
 
     def get_states(self, lamin, lomin, lamax, lomax):
         if self.debug_mode:
-            return OpenSkyStatesAllResponse(utils.debug_states_all_response(5))
+            return OpenSkyStatesResponse(utils.debug_states_all_response(5))
 
         params = {
             'lamin': lamin,
@@ -118,4 +118,4 @@ class OpenSky:
         }
 
         response = requests.get(self.root_url + '/states/all', auth=self.auth, params=params)
-        return OpenSkyStatesAllResponse(response.json())
+        return OpenSkyStatesResponse(response.json())

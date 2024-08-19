@@ -2,6 +2,7 @@ import requests
 from geopy.distance import geodesic
 from geopy.point import Point
 
+import utils
 from utils import nullable_datetime
 
 
@@ -63,7 +64,7 @@ class OpenSkyState:
 
 
 class OpenSky:
-    def __init__(self, username, password):
+    def __init__(self, username, password, debug_mode=False):
         self.root_url = 'https://opensky-network.org/api'
 
         # If no username and password are provided, opensky will work, but limit you as an anonymous user.
@@ -71,8 +72,10 @@ class OpenSky:
         self.auth = None
         if username and password:
             self.auth = (username, password)
-
         self.assert_connection()
+
+        # Debug mode gives mock data instead of calling to the API
+        self.debug_mode = debug_mode
 
     def assert_connection(self):
         params = {
@@ -104,6 +107,9 @@ class OpenSky:
         return self.get_flights_in_box(min_lat, min_lon, max_lat, max_lon)
 
     def get_flights_in_box(self, lamin, lomin, lamax, lomax):
+        if self.debug_mode:
+            return OpenSkyResponse(utils.debug_opensky_response(5))
+
         params = {
             'lamin': lamin,
             'lomin': lomin,
